@@ -121,7 +121,7 @@ public:
 
 	DWORD64 htonll(DWORD64 value)
 	{
-		return ( ( (DWORD64)htonl(value) ) << 32 ) | htonl((value >> 32));
+		return ( ( (DWORD64)htonl((DWORD32)value) ) << 32 ) | htonl((DWORD32)(value >> 32));
 	}
 
 	//ÍøÂç×Ö½Ú
