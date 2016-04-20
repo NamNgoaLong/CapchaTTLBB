@@ -32,7 +32,6 @@ public:
 	//改变大小
 	char *resize(ULONG len)
 	{
-		char *sbuf = hbuff;
 		if (len || hbuff) hbuff = (char *)realloc(hbuff, len);
 		csize = len;
 		return hbuff;
@@ -122,7 +121,7 @@ public:
 
 	DWORD64 htonll(DWORD64 value)
 	{
-		return (((DWORD64)htonl(value)) << 32 ) | htonl((value >> 32));
+		return ( ( (DWORD64)htonl(value) ) << 32 ) | htonl((value >> 32));
 	}
 
 	//网络字节

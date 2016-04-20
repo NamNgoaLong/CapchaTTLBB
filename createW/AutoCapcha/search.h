@@ -9,18 +9,18 @@
 namespace namespcace_MySearch
 {
 
-	void DPrint(char *format, ...)
+	void DPrint( char *format, ... )
 	{
 		va_list arg_ptr;
 		char outstr[0x1000];
-		va_start(arg_ptr, format);
-		vsprintf(outstr, format, arg_ptr);
-		OutputDebugStringA(outstr);
-		va_end(arg_ptr);
+		va_start( arg_ptr, format );
+		vsprintf_s( outstr, sizeof(outstr), format, arg_ptr );
+		OutputDebugStringA( outstr );
+		va_end( arg_ptr );
 	}
 
-	DWORD SearchFor(char *markCode, int checkOffset, char *checkCode, 
-		DWORD beginAddr = 0x00400000, DWORD endAddr = 0x7FFFFFFF)
+	DWORD SearchFor( char *markCode, int checkOffset, char *checkCode, 
+		DWORD beginAddr = 0x00400000, DWORD endAddr = 0x7FFFFFFF )
 	{
 		DWORD _break = 0;
 		int mlen;
@@ -41,7 +41,7 @@ namespace namespcace_MySearch
 			return 0;
 		}
 
-		if (strlen(markCode) % 2 != 0) 
+		if ( strlen(markCode ) % 2 != 0) 
 		{
 			DPrint(TEXT("ÌØÕ÷Âë¸ñÊ½´íÎó£¡%d\r\n") , strlen(markCode));
 			return 0;

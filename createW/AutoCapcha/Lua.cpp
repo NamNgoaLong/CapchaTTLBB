@@ -5,7 +5,8 @@
 //#include "function2.h"
 
 
-BOOL MyLua::luaDoStringV( const char* szCmd , ... ){
+BOOL MyLua::luaDoStringV( const char* szCmd , ... )
+{
 	//char szText[256] = {0};
 	//va_list arglist;
 //	functions::DPrint("%s",szCmd);

@@ -10,9 +10,10 @@ using namespace functions;
 extern App *app;
 extern bool g_ModuleExit;
 
-App::App(){
+App::App()
+{
 	hMappingFile = NULL;
-	strcpy(info.szNamePlayer, "");
+	strcpy_s( info.szNamePlayer, sizeof(info.szNamePlayer), "" );
 
 
 
@@ -20,25 +21,36 @@ App::App(){
 	decrypt.initPacketMsgProcess();
 	decrypt.initClientOffsetProcess();
 	decrypt.hookGameRecv();
+
 	char szNamePlayer[128];
 	decrypt.getAccountInfo(szNamePlayer, sizeof(szNamePlayer));
+
 	DPrint("Name Player: %s", szNamePlayer);
+
 	unsigned int AppThreadId;
 	CloseHandle((HANDLE)_beginthreadex( NULL, 0, &App::updateInfo, 0, 0, &AppThreadId ));
 
 }
 
-unsigned int _stdcall App::updateInfo(LPVOID lParam){
+unsigned int _stdcall App::updateInfo( LPVOID lParam )
+{
+	UNREFERENCED_PARAMETER( lParam );
 	char szNamePlayer[128];
-	strcpy(szNamePlayer, "");
-	while(__AutoFreeLibrary_IsNotExit){
-		if(!app->decrypt.getAccountInfo(szNamePlayer, sizeof(szNamePlayer)))
+	strcpy_s( szNamePlayer, sizeof(szNamePlayer), "" );
+	while( __AutoFreeLibrary_IsNotExit )
+	{
+		if( !app->decrypt.getAccountInfo( szNamePlayer, sizeof( szNamePlayer ) ) )
 			continue;
-		if(0 != strcmp(szNamePlayer, app->info.szNamePlayer)){
-			strcpy(app->info.szNamePlayer, szNamePlayer);
-			if(app->nxCreateMappingFile(GetCurrentProcessId(), false)){
-				app->nxSendMessage(GetCurrentProcessId(), -1);
-			}else{
+
+		if( 0 != strcmp( szNamePlayer, app->info.szNamePlayer ) )
+		{
+			strcpy_s( app->info.szNamePlayer, sizeof( app->info.szNamePlayer ), szNamePlayer );
+			if( app->nxCreateMappingFile( GetCurrentProcessId(), false ) )
+			{
+				app->nxSendMessage( GetCurrentProcessId(), -1 );
+			}
+			else
+			{
 				DPrint("Error Create mapping file Login");
 			}
 		}
@@ -48,25 +60,31 @@ unsigned int _stdcall App::updateInfo(LPVOID lParam){
 
 
 
-bool App::nxSendMessage(int wParam, int lParam){
-	HWND hWndCapchaNxDati = FindWindow(TEXT("#32770"), TEXT(NAME_CAPTION_AUTO_CAPCHA));
-	if(NULL == hWndCapchaNxDati){
-		DPrint("Find Window AutoCapcha failed 1");
+bool App::nxSendMessage( int wParam, int lParam )
+{
+	HWND hWndCapchaNxDati = FindWindow( TEXT( "#32770" ), TEXT( NAME_CAPTION_AUTO_CAPCHA ) );
+	if( NULL == hWndCapchaNxDati )
+	{
+		DPrint( "Find Window AutoCapcha failed 1" );
 		return false;
-	}else{
+	}
+	else
+	{
 		DPrint("Find Window AutoCapcha hWndCapchaNxDati: %x ", hWndCapchaNxDati);
-		PostMessage(hWndCapchaNxDati, MYWM_MESSAGE, (WPARAM)wParam, (LPARAM)lParam);//
+
+		PostMessage( hWndCapchaNxDati, MYWM_MESSAGE, (WPARAM)wParam, (LPARAM)lParam );//
 		return true;
 	}
 }
 
-BOOL App::nxCreateMappingFile(int nCodeName, bool bPassCapcha){
+BOOL App::nxCreateMappingFile( int nCodeName, bool bPassCapcha )
+{
 
 	char szName[256];
-	strcpy(szName, NAME_MAP_FILE);
+	strcpy_s( szName, sizeof(szName), NAME_MAP_FILE );
 	char szCodeName[256];
-	sprintf_s(szCodeName, sizeof(szCodeName),"%d", int(nCodeName));
-	strcat(szName, szCodeName);
+	sprintf_s( szCodeName, sizeof( szCodeName ),"%d", int( nCodeName ) );
+	strcat_s( szName, sizeof(szName), szCodeName );
 
 
 	char* pBuf;
@@ -76,47 +94,53 @@ BOOL App::nxCreateMappingFile(int nCodeName, bool bPassCapcha){
 		PAGE_READWRITE,          // read/write access
 		0,                       // maximum object size (high-order DWORD)
 		BUF_SIZE_BMP +256,                // maximum object size (low-order DWORD)
-		szName);                 // name of mapping object
+		szName );                 // name of mapping object
 
-	if (hMappingFile == NULL)
+	if ( hMappingFile == NULL )
 	{
-		DPrint("Could not create file mapping object (%d).\n", GetLastError());
+		DPrint( "Could not create file mapping object (%d).\n", GetLastError() );
 		return FALSE;
 	}
-	if(bPassCapcha){
+
+	if( bPassCapcha )
+	{
 		pBuf = (LPTSTR) MapViewOfFile(hMappingFile,   // handle to map object
 			FILE_MAP_ALL_ACCESS, // read/write permission
 			0,
 			0,
 			BUF_SIZE_BMP +256);
-	}else{
-		pBuf = (LPTSTR) MapViewOfFile(hMappingFile,   // handle to map object
+	}
+	else
+	{
+		pBuf = (LPTSTR) MapViewOfFile( hMappingFile,   // handle to map object
 			FILE_MAP_ALL_ACCESS, // read/write permission
 			0,
 			0,
-			256);
+			256 );
 
 	}
-	if (pBuf == NULL)
+	if ( pBuf == NULL )
 	{
-		DPrint("Could not map view of file (%d).\n",GetLastError());
-		CloseHandle(hMappingFile);
+		DPrint( "Could not map view of file (%d).\n",GetLastError() );
+		CloseHandle( hMappingFile );
 		return FALSE;
 	}	
-	if(bPassCapcha){
+	if( bPassCapcha )
+	{
 		stBmpCapcha stSendData;
-		strcpy(stSendData.szAnser, nxDati.stDataCaptcha.szAnser);
-		memcpy(stSendData.szDataBmp, nxDati.stDataCaptcha.szDataBmp, 0x240);
-		CopyMemory((PVOID)pBuf, &stSendData, sizeof(stSendData));
+		strcpy_s( stSendData.szAnser, sizeof(stSendData.szAnser), nxDati.stDataCaptcha.szAnser );
+		memcpy( stSendData.szDataBmp, nxDati.stDataCaptcha.szDataBmp, 0x240 );
+		CopyMemory( (PVOID)pBuf, &stSendData, sizeof( stSendData ) );
 	}
-	else{
+	else
+	{
 
 		char szNamePlayer[128];
-		if(app->decrypt.getAccountInfo(szNamePlayer, sizeof(szNamePlayer)))
-			CopyMemory((PVOID)pBuf, szNamePlayer, sizeof(szNamePlayer));
+		if( app->decrypt.getAccountInfo( szNamePlayer, sizeof( szNamePlayer) ) )
+			CopyMemory( (PVOID)pBuf, szNamePlayer, sizeof( szNamePlayer ) );
 
 	}
-	UnmapViewOfFile(pBuf);
+	UnmapViewOfFile( pBuf );
 // Chua dong file Handle
 	return TRUE;
 }

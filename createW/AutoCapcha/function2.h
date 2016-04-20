@@ -23,17 +23,18 @@ namespace functions
 	*    
 	*    
 	*/
-	static void myRegisterDlg(HINSTANCE hInstance, char* szClassName, WNDPROC wndDlgProc)
+/*
+	static void myRegisterDlg( HINSTANCE hInstance, char* szClassName, WNDPROC wndDlgProc )
 	{
 		WNDCLASSEX wc;
-		wc.cbSize = sizeof(WNDCLASSEX);
-		GetClassInfoEx(hInstance, szClassName, &wc) ;
+		wc.cbSize = sizeof( WNDCLASSEX );
+		GetClassInfoEx( hInstance, szClassName, &wc ) ;
 		wc.lpfnWndProc  = wndDlgProc;
 		wc.hInstance = hInstance;
 		wc.lpszClassName = szClassName;
-		RegisterClassEx(&wc) ;
+		RegisterClassEx( &wc ) ;
 	}
-
+/**/
 	/// unregistry dialog
 	/**
 	* @pre
@@ -49,11 +50,12 @@ namespace functions
 	*    
 	*    
 	*/	
-	static void myUnRegister(HINSTANCE hInstance, char* szName)
+/*
+	static void myUnRegister( HINSTANCE hInstance, char* szName )
 	{
 		UnregisterClass( szName, hInstance ) ;
 	}
-
+/**/
 
 	/// unregistry winodws
 	/**
@@ -71,18 +73,19 @@ namespace functions
 	*    
 	*    
 	*/	
-	static void myRegisterWindow(HINSTANCE hInstance, char* szClassName, WNDPROC wndProc)
+/*
+	static void myRegisterWindow( HINSTANCE hInstance, char* szClassName, WNDPROC wndProc )
 	{
 		WNDCLASS wc = {0};
 		wc.lpszClassName = szClassName;
 		wc.hInstance = hInstance;
-		wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
+		wc.hbrBackground = GetSysColorBrush( COLOR_3DFACE );
 		wc.lpfnWndProc = wndProc;
-		wc.hCursor = LoadCursor(0, IDC_ARROW);
-		RegisterClass(&wc);
+		wc.hCursor = LoadCursor( 0, IDC_ARROW );
+		RegisterClass( &wc );
 
 	}
-
+/**/
 	/// unregistry windows
 	/**
 	* @pre
@@ -98,11 +101,12 @@ namespace functions
 	*    
 	*    
 	*/
-	static void myUnRegisterWindow(HINSTANCE hInstance, char* szName)
+/*
+	static void myUnRegisterWindow( HINSTANCE hInstance, char* szName )
 	{
 		UnregisterClass( szName, hInstance ) ;
 	} 
-
+/**/
 
 
 	/// loop get message Dialog
@@ -119,19 +123,19 @@ namespace functions
 	*    
 	*    
 	*/
-	void myLoopMessageDlg(HWND hWnd)
+	void myLoopMessageDlg( HWND hWnd )
 	{
 		MSG msg;
 		BOOL bRet = FALSE ;
-		while ( bRet = GetMessage(&msg, NULL, 0, 0) )
+		while ( bRet = GetMessage( &msg, NULL, 0, 0 ) )
 		{ 
 			if ( -1 == bRet )
 				continue ;
 
-			if (!IsDialogMessage(hWnd, &msg)) 
+			if ( !IsDialogMessage( hWnd, &msg ) ) 
 			{ 
-				TranslateMessage(&msg); 
-				DispatchMessage(&msg); 
+				TranslateMessage( &msg ); 
+				DispatchMessage( &msg ); 
 			} 
 		}
 	}
@@ -151,27 +155,27 @@ namespace functions
 	*    
 	*    
 	*/
-	void myLoopMessageWindow(HWND hWnd)
+	void myLoopMessageWindow( HWND hWnd )
 	{
 		MSG msg;
 		BOOL bRet = FALSE ;
-		while ( bRet = GetMessage(&msg, NULL, 0, 0) )
+		while ( bRet = GetMessage( &msg, NULL, 0, 0 ) )
 		{ 
 			if ( -1 == bRet )
 				continue ;
-			if (!IsDialogMessage(hWnd, &msg)) 
+			if ( !IsDialogMessage( hWnd, &msg ) ) 
 			{ 
-				TranslateMessage(&msg); 
-				DispatchMessage(&msg); 
+				TranslateMessage( &msg ); 
+				DispatchMessage( &msg ); 
 			} 
 		}		
 	}
 	/// set font to windows
-	void mySetFont(HWND hWnd, char* szFontName, int nSize)
+	void mySetFont( HWND hWnd, char* szFontName, int nSize )
 	{
 		LOGFONT lfont;
-		memset(&lfont, 0, sizeof(lfont));
-		lstrcpy(lfont.lfFaceName, szFontName);
+		memset( &lfont, 0, sizeof( lfont ) );
+		lstrcpy( lfont.lfFaceName, szFontName );
 		lfont.lfHeight = nSize;
 		lfont.lfWeight = FW_NORMAL;//FW_BOLD;
 		lfont.lfItalic = FALSE;
@@ -180,43 +184,46 @@ namespace functions
 		lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 		lfont.lfQuality = DEFAULT_QUALITY;
 		lfont.lfPitchAndFamily = DEFAULT_PITCH;
-		SendMessage(hWnd, WM_SETFONT,(WPARAM)CreateFontIndirect(&lfont), 0);	
+		SendMessage( hWnd, WM_SETFONT,(WPARAM)CreateFontIndirect( &lfont ), 0 );	
 	}
 
 	//------------------------------- FIND HWND MAIN WINDOWS FROM PROCESS ID--------------------------
 
 	/// check handle is GW_OWNER windows in process
-	BOOL isMainWindow(HWND handle)
+	BOOL isMainWindow( HWND handle )
 	{
-		return GetWindow(handle, GW_OWNER) == (HWND)0 && IsWindowVisible(handle);
+		return GetWindow( handle, GW_OWNER ) == (HWND)0 && IsWindowVisible( handle );
 	}
 
 	/// find main windows by process id
 	// @return: HWND of windows
-	HWND findHandleMain(DWORD proceesID)
+	HWND findHandleMain( DWORD proceesID )
 	{
 		//			DWORD processID = 0;
 		HWND hWndF = 0;
-		do{
-			hWndF = FindWindowEx(NULL, hWndF, NULL, NULL );
+		do
+		{
+			hWndF = FindWindowEx( NULL, hWndF, NULL, NULL );
 			//				hWndF = FindWindowEx(0, 0, "TianLongBaBu WndClass", 0);
 			DWORD dwPID = 0;
-			GetWindowThreadProcessId(hWndF, &dwPID);
-			if(dwPID == proceesID){
-				if(isMainWindow(hWndF))
+			GetWindowThreadProcessId( hWndF, &dwPID );
+			if( dwPID == proceesID )
+			{
+				if( isMainWindow( hWndF ) )
 					//						DPrint("Process ID(%d) : %d , HWND: %x ", ++i, dwPID, hWndF);
 					return hWndF;
 			}
-		}while(hWndF != NULL);
+		}while( hWndF != NULL ) ;
+
 		return 0;
 	}
 	/// draw items in liview
-	LRESULT ProcessCustomDraw (LPARAM lParam, std::vector<int> &vtItems)
+	LRESULT ProcessCustomDraw( LPARAM lParam, std::vector<int> &vtItems )
 	{	
 		LPNMLVCUSTOMDRAW lplvcd = (LPNMLVCUSTOMDRAW)lParam;
 
 		//	lplvcd->clrText
-		switch(lplvcd->nmcd.dwDrawStage) 
+		switch( lplvcd->nmcd.dwDrawStage ) 
 		{
 		case CDDS_PREPAINT : //Before the paint cycle begins
 			//request notifications for individual listview items
@@ -231,14 +238,14 @@ namespace functions
 			//        case CDDS_SUBITEM | CDDS_ITEMPREPAINT: //Before a subitem is drawn
 		case CDDS_SUBITEM | CDDS_ITEMPREPAINT: //Before a subitem is drawn
 			{
-				if(!vtItems.empty())
+				if( !vtItems.empty() )
 				{
 					for(int i = 0; i < (int)vtItems.size(); i++)
 					{
-						if(lplvcd->nmcd.dwItemSpec == int(vtItems.at(i)))
+						if( (int)lplvcd->nmcd.dwItemSpec == (int)vtItems.at(i) )
 						{
-							lplvcd->clrText   = RGB(255,255,255);
-							lplvcd->clrTextBk = RGB(240,55,23);
+							lplvcd->clrText   = RGB( 255, 255, 255 );
+							lplvcd->clrTextBk = RGB( 240, 55, 23 );
 							return CDRF_NEWFONT;					
 						}
 					}
@@ -349,13 +356,13 @@ namespace functions
 		return CDRF_DODEFAULT;
 	}
 
-	void DPrint(char *format, ...)
+	void DPrint( char *format, ... )
 	{
 		va_list arg_ptr;
 		char outstr[0x1000];
-		va_start(arg_ptr, format);
-		vsprintf(outstr, format, arg_ptr);
-		OutputDebugStringA(outstr);
-		va_end(arg_ptr);
+		va_start( arg_ptr, format );
+		vsprintf_s( outstr, sizeof( outstr ), format, arg_ptr );
+		OutputDebugStringA( outstr );
+		va_end( arg_ptr );
 	}
 }
