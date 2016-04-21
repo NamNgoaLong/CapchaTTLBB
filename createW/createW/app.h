@@ -1,5 +1,5 @@
 #pragma once
-#include <windows.h>
+//#include <windows.h>
 #include "nxdati.h"
 #include "CIniFile.h"
 #include <map>
@@ -8,14 +8,14 @@
 #include "Inject.h"
 
 
-class App:public NXDATI
+class App : public NXDATI
 {
 public:
 	bool bAutoStart;
 	bool bCheckGain;
 	bool bSavePass;
 
-	CIniFile* ciniFile;
+	CIniFile* ciniFile; //kiemtra
 	static HINSTANCE hInstMain;
 	static HWND hwndMain;
 	static HWND hwndRegister; // hwnd dialog registry account in NXDati
@@ -37,9 +37,9 @@ public:
 	bool deCryptPassword( char *password, char *outPass );	
 
 	BOOL readFileMapping( int nCodeName, int nPID, bool bPassCapcha );
-	char* createCaptchaBmp( int nPID, bool bCheck, char* lpBuffer, int nWidth, int nHeight, int* nlpOutLen, BOOL IsSaveFile,  ... );
+	char* createCaptchaBmp( int nPID, HANDLE &hMapFile , bool bCheck, char* lpBuffer, int nWidth, int nHeight, int* nlpOutLen, BOOL IsSaveFile,  ... );
 
-	BOOL createMappingBmp( int nCodeName, stObjRecognize &stObj );
+	BOOL createMappingBmp( int nCodeName, HANDLE &hMapFile, stObjRecognize &stObj );
 	BOOL readFileMappingBMP( stCodeResult* objCodeRet );
 	bool returnObjMapping( int nCodeName, stObjRecognize *stObjRet );
 
@@ -47,13 +47,15 @@ public:
 
 
 };
+
+
 App::App()
 {
 	bAutoStart = false;
 	bCheckGain = false;
 	bSavePass = false;
 	hBmp = NULL;
-	NXDATI::NXDATI();	 
-	//	 objInject();
+	NXDATI::NXDATI();	
+	Inject::Inject();
 	ciniFile = new CIniFile( NAME_FILE_CONFIG );
 }

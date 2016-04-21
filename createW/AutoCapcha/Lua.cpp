@@ -4,9 +4,10 @@
 #include <stdio.h>
 //#include "function2.h"
 
-
+/*
 BOOL MyLua::luaDoStringV( const char* szCmd , ... )
 {
+	UNREFERENCED_PARAMETER( szCmd );
 	//char szText[256] = {0};
 	//va_list arglist;
 //	functions::DPrint("%s",szCmd);
@@ -22,7 +23,7 @@ BOOL MyLua::luaDoStringV( const char* szCmd , ... )
 	return true;
 
 }
-
+/**/
 /*
 BOOL MyLua::luaDoStringSafe_CallBack( const char* szCmd , void* lParam ){
 	lua_result_list* pResult = (lua_result_list*)lParam;

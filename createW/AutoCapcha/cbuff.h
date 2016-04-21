@@ -121,16 +121,16 @@ public:
 
 	DWORD64 htonll(DWORD64 value)
 	{
-		return ( ( (DWORD64)htonl(value) ) << 32 ) | htonl(()(value >> 32));
+		return ( ( (DWORD64)htonl((DWORD32)value) ) << 32 ) | htonl((DWORD32)(value >> 32));
 	}
 
 	//ÍøÂç×Ö½Ú
 	template<class T> 
 	T bswap(T a)
 	{
-		if (sizeof(T) == 2) a = htons(a);
-		else if(sizeof(T) == 4) a = htonl(a);
-		else if(sizeof(T) == 8) a = htonll(a);
+		if (sizeof(T) == 2) a = (T)htons( (WORD)a );
+		else if(sizeof(T) == 4) a = (T)htonl( (DWORD32)a );
+		else if(sizeof(T) == 8) a = (T)htonll( (DWORD64)a );
 		return a;
 	}
 

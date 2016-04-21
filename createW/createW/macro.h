@@ -54,7 +54,7 @@ typedef struct _stBmpCapcha
 
 
 
-#define BUF_SIZE_RECOGNIZE	128*108*4 +256
+#define BUF_SIZE_RECOGNIZE	73728 + 1024
 
 typedef struct _stObjRecognize
 {
@@ -76,6 +76,7 @@ typedef struct _stCodeResult
 	int nCodeName; // code name mapping file
 	int nResult; // result from NXDati
 	int nPID; // process id
+	HANDLE hMapFile;
 }stCodeResult;
 
 enum Result{ result_nxdati_error = -1, result_nxdati_ok, nx_nameplayer, nx_pass_capcha };

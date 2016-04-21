@@ -127,7 +127,7 @@ namespace functions
 	{
 		MSG msg;
 		BOOL bRet = FALSE ;
-		while ( bRet = GetMessage( &msg, NULL, 0, 0 ) )
+		while ( 0 != (bRet = GetMessage( &msg, NULL, 0, 0 ) ) )
 		{ 
 			if ( -1 == bRet )
 				continue ;
@@ -159,7 +159,7 @@ namespace functions
 	{
 		MSG msg;
 		BOOL bRet = FALSE ;
-		while ( bRet = GetMessage( &msg, NULL, 0, 0 ) )
+		while ( 0 != (bRet = GetMessage( &msg, NULL, 0, 0 ) ) )
 		{ 
 			if ( -1 == bRet )
 				continue ;

@@ -2,7 +2,7 @@
 #include <map>
 #include "macro.h"
 #include <vector>
-
+#pragma once
 #pragma comment( lib, "psapi.lib" )
 
 typedef struct _stDataPackKet
@@ -483,7 +483,9 @@ public:
 	BOOL matchOffsetCode( DWORD uIndex , DWORD& dwData , HMODULE dwGameMainBase, HMODULE dwGameUI, HMODULE dwLuaPlus ) ;
 
 	BOOL getAccountInfo( char* pBuffer , int len );	
-
+	bool initData( void ) ;
+	static unsigned int _stdcall initAddrData( LPVOID lParam ) ;
+	void startInitAddrProcess( void ) ;
 	BOOL hookGameRecv( void );
 	int _fastcall onInlineRecv( DWORD pPacketObj , DWORD pPacket , DWORD pNetman );
 	void onRecvEx( char* lpBuffer , int uIndex , int uMsg , DWORD& dwOutExeFlag );

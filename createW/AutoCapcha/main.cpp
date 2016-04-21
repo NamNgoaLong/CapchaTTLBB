@@ -5,8 +5,11 @@
 App* app = NULL;
 bool g_ModuleExit = false;
 
-BOOL WINAPI DllMain(HINSTANCE hmodule,DWORD reason,LPVOID lpreserved)
+BOOL WINAPI DllMain( HINSTANCE hmodule, DWORD reason, LPVOID lpreserved )
 {
+	UNREFERENCED_PARAMETER( hmodule );
+	UNREFERENCED_PARAMETER( reason );
+	UNREFERENCED_PARAMETER( lpreserved );
 	switch (reason){
 	case DLL_PROCESS_ATTACH:
 		{

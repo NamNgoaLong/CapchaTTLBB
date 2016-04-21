@@ -25,8 +25,8 @@ void DPrint( char *format, ... )
 void Inject::getModulePath(char*szPathModule, char* szOutPath)
 {
 	GetModuleFileNameA(GetModuleHandle(NULL), szOutPath, MAX_PATH);
-	strcpy_s(strrchr(szOutPath, '\\') + 1,sizeof(szOutPath), NAME_PATH_DLL);
-	strcpy_s(strrchr(szOutPath, '\\') + 1,sizeof(szOutPath), szPathModule);
+	strcpy_s(strrchr(szOutPath, '\\') + 1, strlen( szOutPath ) + 1, NAME_PATH_DLL);
+	strcpy_s(strrchr(szOutPath, '\\') + 1, strlen( szOutPath ) + 1, szPathModule);
 	DPrint("path: %s", szOutPath);
 }
 

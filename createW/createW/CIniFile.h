@@ -44,7 +44,6 @@ public:
 	bool CIniFileReBoolean( char* szSection, char* szKey, bool bolDefaultValue );
 	char* CIniFileReString( char* szSection, char* szKey, const char* szDefaultValue );
 
-
 };
 
 CIniFile::CIniFile( char *szFileName ) : CIniReader( szFileName ), CIniWriter( szFileName ){
@@ -90,7 +89,7 @@ char* CIniFile::CIniFileReString( char* szSection, char* szKey, const char* szDe
 CIniReader::CIniReader( char* szFileName )
 {
 	memset( m_szFileName, 0x00, 255 );
-	memcpy( m_szFileName, szFileName, strlen( szFileName ) );
+	memcpy( m_szFileName, szFileName, strlen( szFileName ) + 1 );
 }
 int CIniReader::ReadInteger( char* szSection, char* szKey, int iDefaultValue )
 {
@@ -102,7 +101,7 @@ float CIniReader::ReadFloat( char* szSection, char* szKey, float fltDefaultValue
 	char szResult[255];
 	char szDefault[255];
 	float fltResult;
-	sprintf_s( szDefault, strlen(szDefault) +1 , "%f", fltDefaultValue );
+	sprintf_s( szDefault, sizeof( szDefault ) , "%f", fltDefaultValue );
 	GetPrivateProfileString( szSection,  szKey, szDefault, szResult, 255, m_szFileName ); 
 	fltResult =  (float)atof( szResult );
 	return fltResult;
@@ -112,7 +111,7 @@ bool CIniReader::ReadBoolean( char* szSection, char* szKey, bool bolDefaultValue
 	char szResult[255];
 	char szDefault[255];
 	bool bolResult;
-	sprintf_s( szDefault, strlen(szDefault) + 1, "%s", bolDefaultValue ? "True"  :  "False" );
+	sprintf_s( szDefault, sizeof(szDefault), "%s", bolDefaultValue ? "True"  :  "False" );
 	GetPrivateProfileString( szSection, szKey, szDefault, szResult, 255, m_szFileName ); 
 	bolResult =  ( strcmp( szResult, "True" ) == 0 || 
 		strcmp( szResult, "true" ) == 0 ) ? true : false;
@@ -130,24 +129,24 @@ char* CIniReader::ReadString( char* szSection, char* szKey, const char* szDefaul
 CIniWriter::CIniWriter( char* szFileName )
 {
 	memset( m_szFileName, 0x00, 255 );
-	memcpy( m_szFileName, szFileName, strlen( szFileName ) );
+	memcpy( m_szFileName, szFileName, strlen( szFileName ) + 1 );
 }
 void CIniWriter::WriteInteger( char* szSection, char* szKey, int iValue )
 {
 	char szValue[255];
-	sprintf_s( szValue, strlen( szValue ) + 1, "%d", iValue );
+	sprintf_s( szValue, sizeof( szValue ), "%d", iValue );
 	WritePrivateProfileString( szSection,  szKey, szValue, m_szFileName ); 
 }
 void CIniWriter::WriteFloat( char* szSection, char* szKey, float fltValue )
 {
 	char szValue[255];
-	sprintf_s( szValue, strlen( szValue ) + 1, "%f", fltValue );
+	sprintf_s( szValue, sizeof( szValue ), "%f", fltValue );
 	WritePrivateProfileString( szSection,  szKey, szValue, m_szFileName ); 
 }
 void CIniWriter::WriteBoolean( char* szSection, char* szKey, bool bolValue )
 {
 	char szValue[255];
-	sprintf_s( szValue, strlen( szValue ) + 1, "%s", bolValue ? "True" : "False" );
+	sprintf_s( szValue, sizeof( szValue ), "%s", bolValue ? "True" : "False" );
 	WritePrivateProfileString( szSection,  szKey, szValue, m_szFileName ); 
 }
 void CIniWriter::WriteString( char* szSection, char* szKey, char* szValue )

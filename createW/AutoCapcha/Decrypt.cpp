@@ -6,6 +6,7 @@
 #include "Decrypt.h"
 #include "cbuff.h"
 #include <string>
+#include "app.h"
 #pragma comment( lib, "psapi.lib" )
 
 using namespace namespcace_MySearch ;
@@ -13,6 +14,12 @@ using namespace namespcace_MySearch ;
 std::map<DWORD, stDataPacket> Decrypt::m_stPacketData;
 DWORD Decrypt::m_dwDatatAddr[GAMEADR_MAXINDEX];
 DWORD Decrypt::m_dwOffsetData[GAMEOFFSET_MAXINDEX];
+
+
+extern App *app;
+extern bool g_ModuleExit;
+
+
 
 //-------------------------------------------------------------------
 char* _tl_string_c_str( void* lpstring ) 
@@ -109,9 +116,14 @@ BOOL Decrypt::initPacketMsgProcess( void )
 
 BOOL Decrypt::matchPacketCode( HMODULE hModule, DWORD dwFuncAdr, DWORD &uIndex, char *lpOutNameStr, int nNameStrLen, char *lpOutNoteStr, int nNoteStrLen )
 {
+	UNREFERENCED_PARAMETER( lpOutNameStr );
+	UNREFERENCED_PARAMETER( nNameStrLen );
+	UNREFERENCED_PARAMETER( lpOutNoteStr );
+	UNREFERENCED_PARAMETER( nNoteStrLen );
+
 	uIndex = INFINITE;
-	BOOL bIsReturn = FALSE;
-	DWORD dwCall1 = 0, dwTmp = 0, dwAddr = 0;
+//	BOOL bIsReturn = FALSE;
+	DWORD dwCall1 = 0;//, dwTmp = 0, dwAddr = 0;
 	dwCall1 = _SRCforModule( (HMODULE)hModule, 1, dwFuncAdr, dwFuncAdr+0x20, -7 , "83c408", 0, "", NULL, NULL );	
 	if( ::IsBadCodePtr( (FARPROC)dwCall1) )
 	{
@@ -130,6 +142,8 @@ BOOL Decrypt::matchPacketCode( HMODULE hModule, DWORD dwFuncAdr, DWORD &uIndex, 
 
 void onRecvEx( char* lpBuffer , int uIndex , int uMsg , DWORD& dwOutExeFlag )
 {
+	UNREFERENCED_PARAMETER( dwOutExeFlag );
+	UNREFERENCED_PARAMETER( uMsg );
 	CBuff buf ;
 	char byTemp[0x300] = {0};
 	char byCaptchaData[0x240];
@@ -143,7 +157,7 @@ void onRecvEx( char* lpBuffer , int uIndex , int uMsg , DWORD& dwOutExeFlag )
 			buf.add_back( lpBuffer, 0x278 );
 			//			buf.seek_set(0);
 			buf.seek_set( 0x10 ) ;
-			DWORD dwFlag = buf.readd();
+//			DWORD dwFlag = buf.readd();
 
 			memset( byTemp , 0 , sizeof( byTemp ) ) ;
 			buf.seek_set( 0x14 );
@@ -152,13 +166,25 @@ void onRecvEx( char* lpBuffer , int uIndex , int uMsg , DWORD& dwOutExeFlag )
 			buf.seek_set( 0x34 ) ;
 			buf.readm( byCaptchaData, 0x240 );
 
-			buf.seek_set( 0x274 ) ;
+//			buf.seek_set( 0x274 ) ;
 			//			DWORD dwKey = buf.readd();
 
 			char szAnserCapcha[128];
 			::WideCharToMultiByte( 936, 0, (LPCWSTR)byTemp, 16, szAnserCapcha, sizeof(szAnserCapcha), NULL, FALSE ) ; 
+
 			DPrint( "Anser Reviev: %s", szAnserCapcha );
 
+			memset( app->nxDati.stDataCaptcha.szDataBmp , 0 , sizeof( app->nxDati.stDataCaptcha.szDataBmp ) ) ;
+			memcpy_s( app->nxDati.stDataCaptcha.szDataBmp , sizeof( app->nxDati.stDataCaptcha.szDataBmp ) , byCaptchaData , 0x240 ) ;
+			strcpy_s( app->nxDati.stDataCaptcha.szAnser , sizeof( app->nxDati.stDataCaptcha.szAnser ) , szAnserCapcha ) ;
+
+			int nTickCount = GetTickCount() ;
+			if( app->nxCreateMappingFile( nTickCount , true ) )
+			{
+				app->nxSendMessage( GetCurrentProcessId() , nTickCount ) ;
+			}
+			else
+				DPrint( "Error nxCreateMappingFile: %x", GetLastError());
 		}
 		break;
 	}
@@ -276,12 +302,12 @@ BOOL Decrypt::unhookGameRecv()
 {
 	DPrint("UnkhookGameRecv.... ") ;
 	std::map<DWORD, stDataPacket>::iterator it = Decrypt::m_stPacketData.begin();
+	DWORD dwAttri = 0 ;
 	for( ; it != Decrypt::m_stPacketData.end(); it++ )
 	{
-		if ( it->second.dwRealAddr != INFINITE && it->second.dwRealAddr != 0 && it->second.dwNewAddr == (DWORD)onInlineRecvHead );
+		if ( it->second.dwRealAddr != INFINITE && it->second.dwRealAddr != 0 && it->second.dwNewAddr == (DWORD)onInlineRecvHead )
 		{
-			DWORD dwAttri = 0 ;
-			if ( !::VirtualProtectEx( ::GetCurrentProcess(),(LPVOID)( it->first ),sizeof(DWORD) * 8,PAGE_READWRITE,&dwAttri ) )
+			if ( !::VirtualProtectEx( ::GetCurrentProcess(),(LPVOID)( it->first ), sizeof(DWORD) * 8, PAGE_READWRITE, &dwAttri ) )
 				return FALSE ;
 
 			*(DWORD*)( it->first + 0xc ) = it->second.dwRealAddr ;
@@ -719,6 +745,8 @@ BOOL Decrypt::matchClientCode( DWORD uIndex , DWORD& dwRData, HMODULE m_dwGameMa
 
 BOOL Decrypt::matchOffsetCode( DWORD uIndex , DWORD& dwRData , HMODULE m_dwGameMainBaseAddress , HMODULE m_dwGameUi_ceguiBaseAddress , HMODULE hLuaPlusDllBaseAddress){
 
+	UNREFERENCED_PARAMETER( hLuaPlusDllBaseAddress );
+	UNREFERENCED_PARAMETER( m_dwGameUi_ceguiBaseAddress );
 	DWORD dwData = 0 ;
 
 	switch ( uIndex )
@@ -986,17 +1014,79 @@ BOOL Decrypt::getAccountInfo( char* pBuffer , int len )// da login game ok
 	CCommonObject tObj ;
 	CAccountInfo tAccount ;
 	if ( !tAccount.Init() )// Khoi tao m_dwObject = [GAMEADR_BASE_WORLDMAP] -0x10
+	{
+		strcpy_s( pBuffer, 100, "" ) ;
 		return FALSE ;
+	}
+	
 
 	//更新当前玩家数据 // cap nhat nguoi choi hien tai
 	if ( !tObj.InitBySelf() )// Nguoi choi da login game
+	{
+		strcpy_s( pBuffer, 100, "" ) ;
 		return FALSE ;
+	}
 
 	if ( !pBuffer )
+	{
+		strcpy_s( pBuffer, 100, "" ) ;
 		return FALSE ;	
+	}
 	tAccount.GetAccountName( pBuffer , len ) ;// Get username login game laoxiaogl2@changyou.com
 	if ( strlen(pBuffer) <= 0 )
+	{
+		strcpy_s( pBuffer, 100, "" ) ;
 		return FALSE ;
+	}
 
 	return TRUE ;
+}
+
+bool Decrypt::initData()
+{
+	for( int i = 0 ; i < GAMEADR_MAXINDEX ; i++ )
+	{
+		m_dwDatatAddr[i] = INFINITE ;
+	}
+	for( int i = 0 ; i < GAMEOFFSET_MAXINDEX ; i++ )
+	{
+		m_dwOffsetData[i] = INFINITE ;
+	}
+
+	//for( int i = 0 ; i < GAME_PACKET_MAXINDEX ; i++ )
+	//{
+	//	m_stPacketData[i]. = INFINITE ;
+	//}
+
+	if( !initClientAddrProcess() )
+	{
+		app->m_bInitAddrOk = false ;
+		return false ;
+	}
+	if( !initClientOffsetProcess() )
+	{
+		app->m_bInitAddrOk = false ;
+		return false ;
+	}
+	if( !initPacketMsgProcess() )
+	{
+		app->m_bInitAddrOk = false ;
+		return false ;
+	}	
+
+	return true ;
+
+}
+
+unsigned int _stdcall Decrypt::initAddrData( LPVOID lParam )
+{
+//	UNREFERENCED_PARAMETER( lParam );
+	void* lpThis = ( void* )lParam;
+	((Decrypt*)lpThis)-> initData();
+	return 0;
+}
+
+void Decrypt::startInitAddrProcess( void ) 
+{
+	CloseHandle( (HANDLE)_beginthreadex( NULL , 0 , initAddrData , this , 0 , NULL ) ) ;
 }

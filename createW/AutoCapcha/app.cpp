@@ -12,29 +12,33 @@ extern bool g_ModuleExit;
 
 App::App()
 {
+	DPrint( "App::App()" ) ;
+
 	hMappingFile = NULL;
 	strcpy_s( info.szNamePlayer, sizeof(info.szNamePlayer), "" );
 
+//	decrypt.initClientAddrProcess();
+//	decrypt.initPacketMsgProcess();
+//	decrypt.initClientOffsetProcess();
 
-
-	decrypt.initClientAddrProcess();
-	decrypt.initPacketMsgProcess();
-	decrypt.initClientOffsetProcess();
+	decrypt.startInitAddrProcess();
 	decrypt.hookGameRecv();
 
 	char szNamePlayer[128];
-	decrypt.getAccountInfo(szNamePlayer, sizeof(szNamePlayer));
+	decrypt.getAccountInfo( szNamePlayer, sizeof( szNamePlayer ) );
 
-	DPrint("Name Player: %s", szNamePlayer);
+	DPrint( "Name Player: %s", szNamePlayer );
 
 	unsigned int AppThreadId;
 	CloseHandle((HANDLE)_beginthreadex( NULL, 0, &App::updateInfo, 0, 0, &AppThreadId ));
 
 }
 
+
 unsigned int _stdcall App::updateInfo( LPVOID lParam )
 {
 	UNREFERENCED_PARAMETER( lParam );
+	DPrint( "updateInfo" ) ;
 	char szNamePlayer[128];
 	strcpy_s( szNamePlayer, sizeof(szNamePlayer), "" );
 	while( __AutoFreeLibrary_IsNotExit )
@@ -45,8 +49,12 @@ unsigned int _stdcall App::updateInfo( LPVOID lParam )
 		if( 0 != strcmp( szNamePlayer, app->info.szNamePlayer ) )
 		{
 			strcpy_s( app->info.szNamePlayer, sizeof( app->info.szNamePlayer ), szNamePlayer );
+
 			if( app->nxCreateMappingFile( GetCurrentProcessId(), false ) )
 			{
+				DPrint( "info.szNamePlayer: %s", app->info.szNamePlayer );
+
+				app->m_bLogin = true ;
 				app->nxSendMessage( GetCurrentProcessId(), -1 );
 			}
 			else
@@ -54,6 +62,8 @@ unsigned int _stdcall App::updateInfo( LPVOID lParam )
 				DPrint("Error Create mapping file Login");
 			}
 		}
+
+		Sleep( 300 ) ;
 	}
 	return 1;
 }
@@ -83,7 +93,7 @@ BOOL App::nxCreateMappingFile( int nCodeName, bool bPassCapcha )
 	char szName[256];
 	strcpy_s( szName, sizeof(szName), NAME_MAP_FILE );
 	char szCodeName[256];
-	sprintf_s( szCodeName, sizeof( szCodeName ),"%d", int( nCodeName ) );
+	sprintf_s( szCodeName, sizeof( szCodeName ), "%d", (int)nCodeName );
 	strcat_s( szName, sizeof(szName), szCodeName );
 
 
@@ -135,9 +145,9 @@ BOOL App::nxCreateMappingFile( int nCodeName, bool bPassCapcha )
 	else
 	{
 
-		char szNamePlayer[128];
-		if( app->decrypt.getAccountInfo( szNamePlayer, sizeof( szNamePlayer) ) )
-			CopyMemory( (PVOID)pBuf, szNamePlayer, sizeof( szNamePlayer ) );
+//		char szNamePlayer[128];
+//		if( app->decrypt.getAccountInfo( szNamePlayer, sizeof( szNamePlayer) ) )
+			CopyMemory( (PVOID)pBuf, app->info.szNamePlayer, sizeof( app->info.szNamePlayer ) );
 
 	}
 	UnmapViewOfFile( pBuf );

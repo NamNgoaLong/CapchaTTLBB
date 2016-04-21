@@ -58,18 +58,18 @@ NXDATI::NXDATI()
 	nReserve = 1;
 	nPicType = 11;
 	nSoftwareID = 10257;
-	strcpy_s( szSoftwareKey, strlen( szSoftwareKey ) +1 , "2a08fec22e39453db927c3c554b8e2c0" );
-	strcpy_s( szUserName, strlen( szUserName ) + 1, "" );
-	strcpy_s( szPassword, strlen( szPassword ) + 1, "" );
+	strcpy_s( szSoftwareKey, sizeof( szSoftwareKey ), "2a08fec22e39453db927c3c554b8e2c0" );
+	strcpy_s( szUserName, sizeof( szUserName ), "" );
+	strcpy_s( szPassword, sizeof( szPassword ), "" );
 
-	strcpy_s( szResult, strlen( szResult ) +1, "" );
-	strcpy_s( szPicID, strlen( szPicID ) + 1, "" );
-	strcpy_s( szCardId, strlen( szCardId ) + 1, "" );
-	strcpy_s( szPicFilePath, strlen( szPicFilePath ) + 1, "" );
-	strcpy_s( szEmail, strlen( szEmail ) + 1, "" );
-	strcpy_s( szNumQQ, strlen( szNumQQ ) + 1, "" );
-	strcpy_s( szNickName, strlen( szNickName ) + 1, "" );
-	strcpy_s( szPhone,strlen( szPhone ) + 1, "" );
+	strcpy_s( szResult, sizeof( szResult ), "" );
+	strcpy_s( szPicID, sizeof( szPicID ), "" );
+	strcpy_s( szCardId, sizeof( szCardId ), "" );
+	strcpy_s( szPicFilePath, sizeof( szPicFilePath ), "" );
+	strcpy_s( szEmail, sizeof( szEmail ), "" );
+	strcpy_s( szNumQQ, sizeof( szNumQQ ), "" );
+	strcpy_s( szNickName, sizeof( szNickName ), "" );
+	strcpy_s( szPhone, sizeof( szPhone ), "" );
 
 }
 /// load module file NXCaptcha.dll 

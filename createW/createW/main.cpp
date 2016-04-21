@@ -40,6 +40,8 @@ HWND App::hwndRegister = NULL;
 HWND App::hwndListProcess;
 bool App::bStop = false; // stop thread load process
 
+//CIniFile*	App::ciniFile = new CIniFile( NAME_FILE_CONFIG );
+
 static std::multimap<DWORD, nameProcess> listProcessOld;
 static std::multimap<DWORD, stObjMessage> listObjMessage;
 static std::vector<DWORD> listProRunning;// Process running in list Process and it choosed
@@ -49,6 +51,9 @@ static HWND hwndDlgRegistry = NULL;
 static HWND hwndDlgMain = NULL;
 static int nThread = 0;
 
+
+
+
 LVCOLUMN LvCol; // Make Coluom struct for ListView
 LVITEM LvItem;  // ListView Item struct
 
@@ -57,7 +62,10 @@ LVITEM LvItem;  // ListView Item struct
 LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 LRESULT CALLBACK WndProcRegistry( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 LRESULT CALLBACK WndProcDislpay( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+
+
 App* app = NULL;
+
 
 /// thread excute captcha of another process game
 UINT ThreadSendRecognize( LPVOID lParam )
@@ -151,15 +159,15 @@ void App::loopMessageCapcha()
 *    
 */
 
-BOOL App::createMappingBmp( int nCodeName, stObjRecognize &stObj )
+BOOL App::createMappingBmp( int nCodeName, HANDLE &hMapFile, stObjRecognize &stObj )
 {
 	char szName[256];
-	strcpy_s( szName, strlen( szName ) + 1, NAME_MAP_FILE_BMP );
+	strcpy_s( szName, sizeof( szName ), NAME_MAP_FILE_BMP );
 	char szCodeName[256];
-	sprintf_s( szCodeName, strlen( szCodeName ) + 1, "%d", (int)nCodeName );
-	strcat_s( szName, strlen( szName ) + 1, szCodeName );
+	sprintf_s( szCodeName, sizeof( szCodeName ), "%d", (int)nCodeName );
+	strcat_s( szName, sizeof( szName ), szCodeName );
 	//kiemtra
-	HANDLE hMapFile;
+//	HANDLE hMapFile;
 	char* pBuf;
 	hMapFile = CreateFileMappingA(
 		INVALID_HANDLE_VALUE,    // use paging file
@@ -214,7 +222,7 @@ BOOL App::createMappingBmp( int nCodeName, stObjRecognize &stObj )
 */
 
 
-char* App::createCaptchaBmp( int nPID, bool bCheck, char* lpBuffer, int nWidth, int nHeight, int* nlpOutLen, BOOL IsSaveFile,  ... )
+char* App::createCaptchaBmp( int nPID, HANDLE &hMapFile, bool bCheck, char* lpBuffer, int nWidth, int nHeight, int* nlpOutLen, BOOL IsSaveFile,  ... )
 {
 
 	va_list	arg_ptr;
@@ -279,15 +287,16 @@ char* App::createCaptchaBmp( int nPID, bool bCheck, char* lpBuffer, int nWidth, 
 	}
 
 	HGDIOBJ hOldObj = SelectObject( hdcMem, hBmp );
+
 	for ( int i = 0; i < nHeight; i++ )
 	{
 		for ( int j = 0; j < nWidth/8; j++ )
 		{
 			for ( int k = 8; k > 0; k-- )
 			{
-				if ( -1 == SetPixel( hdcMem, j*8 + 8 - k, i,  ( lpBuffer[ j+ i*( nWidth/8 ) ] >> ( k - 1 ) )&1 ) ? RGB( 255 , 255, 255 ) : RGB( 0, 0, 0 )  )
+				if (-1 == SetPixel(hdcMem, j*8+8-k, i, ((lpBuffer[j+i*(nWidth/8)] >> (k-1))&1) ? RGB(255,255,255) : RGB(0,0,0)))
 				{
-					//					DPrint("SetPixel error [%d]", GetLastError());
+						DPrint("SetPixel error [%d]", GetLastError());
 				}
 			}
 		}
@@ -297,12 +306,12 @@ char* App::createCaptchaBmp( int nPID, bool bCheck, char* lpBuffer, int nWidth, 
 	{
 		std::multimap<DWORD, stObjMessage>::const_iterator ptr2 = listObjMessage.find( nPID );
 		stObjRecognize stObj;
-		strcpy_s( stObj.szAnser1, strlen( stObj.szAnser1 ) + 1, p1 );
-		strcpy_s( stObj.szAnser2, strlen( stObj.szAnser2 ) + 1, p2 );
-		strcpy_s( stObj.szAnser3, strlen( stObj.szAnser3 ) + 1, p3 );
-		strcpy_s( stObj.szAnser4, strlen( stObj.szAnser4 ) + 1, p4 );
+		strcpy_s( stObj.szAnser1, sizeof( stObj.szAnser1 ), p1 );
+		strcpy_s( stObj.szAnser2, sizeof( stObj.szAnser2 ), p2 );
+		strcpy_s( stObj.szAnser3, sizeof( stObj.szAnser3 ), p3 );
+		strcpy_s( stObj.szAnser4, sizeof( stObj.szAnser4 ), p4 );
 		GetObject( hBmp, sizeof( BITMAP ), &stObj.bmp );
-		app->createMappingBmp( ptr2->second.dwCodeName, stObj );
+		app->createMappingBmp( ptr2->second.dwCodeName, hMapFile, stObj );
 	}
 
 	nBmpHeight = nHeight*3;
@@ -411,10 +420,10 @@ char* App::createCaptchaBmp( int nPID, bool bCheck, char* lpBuffer, int nWidth, 
 bool App::returnObjMapping( int nCodeName, stObjRecognize *stObjRet )
 {
 	char szName[256];
-	strcpy_s( szName, strlen( szName ) + 1, NAME_MAP_FILE_BMP );//kiemtra
+	strcpy_s( szName, sizeof( szName ), NAME_MAP_FILE_BMP );//kiemtra
 	char szCodeName[256];
-	sprintf_s( szCodeName, strlen( szCodeName ), "%d", nCodeName );
-	strcat_s( szName, strlen( szName ) + 1, szCodeName );
+	sprintf_s( szCodeName, sizeof( szCodeName ), "%d", nCodeName );
+	strcat_s( szName, sizeof( szName ), szCodeName );
 
 	HANDLE hMapFile;
 	//	LPCTSTR pBuf;
@@ -472,7 +481,7 @@ BOOL App::readFileMappingBMP( stCodeResult* objCodeRet )
 {
 
 	char szClassName[256];
-	sprintf_s( szClassName, strlen( szClassName )  +1, "Dis1Play%d", objCodeRet->nCodeName );	
+	sprintf_s( szClassName, sizeof( szClassName ), "Dis1Play%d", objCodeRet->nCodeName );	
 	myRegisterDlg( GetModuleHandle( NULL ),  szClassName, (WNDPROC)WndProcDislpay );	
 	HWND hwndDlgDisplay = CreateDialogParam( GetModuleHandle( NULL ), MAKEINTRESOURCE( IDD_DIALOG_DISPLAYBMP ), NULL, (DLGPROC)WndProcDislpay, (LPARAM)(LPVOID)objCodeRet );
 
@@ -646,6 +655,7 @@ LRESULT CALLBACK WndProcDislpay( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 					//				SendMessage(findHandleMain(stObjRet->nPID), MYWM_MESSAGE, (WPARAM)stObjRet->nPID, (LPARAM)nResultAnser);
 				}
 				SendMessage( findHandleMain( stObjRet->nPID ), MYWM_MESSAGE, (WPARAM)stObjRet->nPID, (LPARAM)777 );
+				CloseHandle(stObjRet->hMapFile);
 				SendMessage( hWnd, WM_CLOSE, 0, 0 );
 
 			}
@@ -694,10 +704,10 @@ BOOL App::readFileMapping( int nCodeName, int nPID, bool bPassCapcha )
 	HANDLE hMapFile;
 	stBmpCapcha* stDataCapcha;
 	char szName[256];
-	strcpy_s( szName, strlen( szName ) + 1, NAME_MAP_FILE );
+	strcpy_s( szName, sizeof( szName ), NAME_MAP_FILE );
 	char szCodeName[256];
-	sprintf_s( szCodeName, strlen( szCodeName ) + 1,"%d", (int)nCodeName );
-	strcat_s( szName, strlen( szName ) + 1, szCodeName );
+	sprintf_s( szCodeName, sizeof( szCodeName ),"%d", (int)nCodeName );
+	strcat_s( szName, sizeof( szName ), szCodeName );
 	DPrint( "szPathFile %s", szName );
 
 	hMapFile = OpenFileMapping(
@@ -730,28 +740,28 @@ BOOL App::readFileMapping( int nCodeName, int nPID, bool bPassCapcha )
 		stBmpCapcha stDataBmp;
 
 		memcpy( stDataBmp.szDataBmp, stDataCapcha->szDataBmp, 0x240 );
-		strcpy_s( stDataBmp.szAnser, strlen(stDataBmp.szAnser) + 1, stDataCapcha->szAnser );
+		strcpy_s( stDataBmp.szAnser, sizeof(stDataBmp.szAnser), stDataCapcha->szAnser );
 		char szAnser1[9];
 		char szAnser2[9];
 		char szAnser3[9];
 		char szAnser4[9];
-		strncpy_s( szAnser1, strlen( szAnser1 ) + 1, stDataCapcha->szAnser, 8 );
+		strncpy_s( szAnser1, sizeof( szAnser1 ), stDataCapcha->szAnser, 8 );
 		szAnser1[8] = '\0';
-		strncpy_s( szAnser2, strlen( szAnser2 ) + 1, stDataCapcha->szAnser +8, 8 );
+		strncpy_s( szAnser2, sizeof( szAnser2 ), stDataCapcha->szAnser +8, 8 );
 		szAnser2[8] = '\0';
-		strncpy_s( szAnser3, strlen( szAnser3 ) + 1, stDataCapcha->szAnser +8*2, 8 );
+		strncpy_s( szAnser3, sizeof( szAnser3 ), stDataCapcha->szAnser +8*2, 8 );
 		szAnser3[8] = '\0';
-		strncpy_s( szAnser4, strlen( szAnser4 ) + 1, stDataCapcha->szAnser +8*3, 8 );
+		strncpy_s( szAnser4, sizeof( szAnser4 ), stDataCapcha->szAnser +8*3, 8 );
 		szAnser4[8] = '\0';
 
 		char szAnserA[12] = "1. ";
 		char szAnserB[12] = "2. ";
 		char szAnserC[12] = "3. ";
 		char szAnserD[12] = "4. ";
-		strcat_s( szAnserA, strlen( szAnserA ) + 1, szAnser1 );
-		strcat_s( szAnserB, strlen( szAnserB ) + 1, szAnser2 );
-		strcat_s( szAnserC, strlen( szAnserC ) + 1, szAnser3 );
-		strcat_s( szAnserD, strlen( szAnserD ) + 1, szAnser4 );
+		strcat_s( szAnserA, sizeof( szAnserA ), szAnser1 );
+		strcat_s( szAnserB, sizeof( szAnserB ), szAnser2 );
+		strcat_s( szAnserC, sizeof( szAnserC ), szAnser3 );
+		strcat_s( szAnserD, sizeof( szAnserD ), szAnser4 );
 
 		DPrint( "String anser: %s", stDataBmp.szAnser );
 		DPrint( "szAnserA: %s, szAnserB: %s, szAnserC: %s, szAnserD: %s ", szAnserA, szAnserB, szAnserC, szAnserD );
@@ -760,7 +770,8 @@ BOOL App::readFileMapping( int nCodeName, int nPID, bool bPassCapcha )
 		GetWindowTextA( GetDlgItem( app->hwndMain, IDC_EDIT_PASSWORD ), app->szPassword, sizeof( app->szPassword ) );		
 
 		int nLenBmp;
-		char* pszBmpBuf = (char*)app->createCaptchaBmp( nPID, ( BST_CHECKED == ( IsDlgButtonChecked( app->hwndMain, IDC_CHECK_CHECKAGAIN ) )?true:false ), stDataCapcha->szDataBmp, 0x240, 0x10*8, &nLenBmp, 1, szAnserA, szAnserB, szAnserC, szAnserD );
+		HANDLE hMapFile;
+		char* pszBmpBuf = (char*)app->createCaptchaBmp( nPID, hMapFile, ( BST_CHECKED == ( IsDlgButtonChecked( app->hwndMain, IDC_CHECK_CHECKAGAIN ) )?true:false ), stDataCapcha->szDataBmp, 0x10*8, 0x24, &nLenBmp, 1, szAnserA, szAnserB, szAnserC, szAnserD );
 		if( !pszBmpBuf )
 		{
 			DPrint( "Error crate bitmap image: %d", GetLastError() );
@@ -780,7 +791,7 @@ BOOL App::readFileMapping( int nCodeName, int nPID, bool bPassCapcha )
 		// Neu kiem tra lai ket qua		
 		//		strcpy(szResult, "1");//kiemtra
 
-		strcpy_s( app->szResult, strlen( app->szResult ) + 1, szResult );
+		strcpy_s( app->szResult, strlen( szResult ) + 1, szResult );
 		DPrint( "Result from nxDati %s", szResult );
 		if( nRet > 0 && ( 0 != strcmp( app->szPicID, "" ) ) )
 		{
@@ -794,6 +805,7 @@ BOOL App::readFileMapping( int nCodeName, int nPID, bool bPassCapcha )
 					{
 						stMsgCode.nResult = atoi( szResult );
 						stMsgCode.nPID = nPID;
+						stMsgCode.hMapFile = hMapFile;
 						app->readFileMappingBMP( &stMsgCode );//kiemtra
 
 					}
@@ -855,8 +867,8 @@ BOOL App::readFileMapping( int nCodeName, int nPID, bool bPassCapcha )
 			if( (int)ptr->first == nPID )
 			{
 				DPrint( "nx_nameplayer %s", pszNamePlayer );
-				strcpy_s( (char*)ptr->second.namePlayer, strlen( ptr->second.namePlayer ) + 1, pszNamePlayer );
-				strcpy_s( (char*)ptr->second.status, strlen( ptr->second.status ) + 1, "Login..." );
+				strcpy_s( (char*)ptr->second.namePlayer, strlen( pszNamePlayer ) + 1, pszNamePlayer );
+				strcpy_s( (char*)ptr->second.status, strlen( "Login..." ) + 1, "Login..." );
 				//					SendMessage(app->hwndMain, MYWM_ADD_PROCESS, 0, 0);			
 			}
 			break;
@@ -878,8 +890,8 @@ bool App::loadProcessGame(){
 	static std::multimap<DWORD,nameProcess> listProcess;
 	nameProcess pName;
 
-	strcpy_s( pName.namePlayer, strlen( pName.namePlayer ) + 1, "Unknown" );
-	strcpy_s( pName.status, strlen( pName.status ) + 1, "Plase login Bot Game" );
+	strcpy_s( pName.namePlayer, sizeof( pName.namePlayer ), "Unknown" );
+	strcpy_s( pName.status, sizeof( pName.status ) + 1, "Plase login Bot Game" );
 
 	while( !app->bStop )
 	{
@@ -952,8 +964,8 @@ bool App::loadProcessGame(){
 						{
 							if( ptr->first == ptrOld->first )
 							{
-								strcpy_s( (char*)ptr->second.namePlayer, strlen( ptr->second.namePlayer ) + 1, (char*)ptrOld->second.namePlayer );
-								strcpy_s( (char*)ptr->second.status, strlen( ptr->second.status ) + 1, (char*)ptrOld->second.status );
+								strcpy_s( (char*)ptr->second.namePlayer, strlen( ptrOld->second.namePlayer ) + 1, (char*)ptrOld->second.namePlayer );
+								strcpy_s( (char*)ptr->second.status, strlen( ptrOld->second.status ) + 1, (char*)ptrOld->second.status );
 							}
 						}					
 					}
@@ -994,7 +1006,7 @@ bool App::enCryptPassword( char *password,  char *outPass )
 {
 	if( password && ( strlen( app->szUserName ) != 0) )
 	{
-		strcpy_s( outPass, strlen( outPass ) + 1, password );
+		strcpy_s( outPass, strlen( password ) + 1, password );
 		int len  = strlen( password );
 		for( int i = 0; i < len; i++ )
 		{	
@@ -1089,11 +1101,12 @@ bool App::setConfigUser()
 
 	return true;	
 }
+
 /// get info user from file config.ini
 void App::getConfigUser()
 {
 	char *userName = app->ciniFile->CIniFileReString( "User", "UserName", "" );
-	strcpy_s( app->szUserName, strlen( app->szUserName ) + 1, userName );	
+	strcpy_s( app->szUserName, strlen( userName ) + 1, userName );	
 
 	bool autoStart = app->ciniFile->CIniFileReBoolean( "Checkbox", "AutoStart", false );
 	bool autoAgain = app->ciniFile->CIniFileReBoolean( "Checkbox", "CheckAgainResultAnser", false );
@@ -1103,11 +1116,11 @@ void App::getConfigUser()
 		char *userPass = app->ciniFile->CIniFileReString( "User", "Password", "" );
 		char passwordDecrypt[30];
 		deCryptPassword( userPass, passwordDecrypt );
-		strcpy_s( app->szPassword, strlen( app->szPassword ) + 1, passwordDecrypt );	
+		strcpy_s( app->szPassword, strlen( passwordDecrypt ) + 1, passwordDecrypt );	
 		SetWindowText( GetDlgItem( app->hwndMain, IDC_EDIT_PASSWORD ), passwordDecrypt );
 	}
 
-	strcpy_s( app->szUserName, sizeof( app->szUserName ), userName );
+	strcpy_s( app->szUserName, strlen( userName ) +1, userName );
 	SetWindowText( GetDlgItem( app->hwndMain, IDC_EDIT_USERNAME ), app->szUserName );
 
 	CheckDlgButton( app->hwndMain, IDC_CHECK_AUTOSTART, autoStart );
@@ -1118,6 +1131,7 @@ void App::getConfigUser()
 /// create app
 bool createApp( HINSTANCE hInstance )
 {
+	DPrint("//********************//");
 	myRegisterDlg( hInstance, CLASS_NAME, WndProc );
 
 	hwndDlgMain = CreateDialogParam( hInstance, MAKEINTRESOURCE( IDD_DIALOG_MAIN ), NULL, (DLGPROC)WndProc, 0 );
@@ -1152,9 +1166,10 @@ return true;
 */
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {		
-	UNREFERENCED_PARAMETER( nCmdShow );
-	UNREFERENCED_PARAMETER( hPrevInstance );
-	UNREFERENCED_PARAMETER( lpCmdLine );
+
+	//UNREFERENCED_PARAMETER( nCmdShow );
+	//UNREFERENCED_PARAMETER( hPrevInstance );
+	//UNREFERENCED_PARAMETER( lpCmdLine );
 	app = new App();	
 	app->nxDatiInit();
 	createApp( hInstance );	
@@ -1277,7 +1292,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ){
 						LvItem.iItem = iSelected;
 
 						SendMessage( app->hwndListProcess, LVM_GETITEMTEXT, (WPARAM)iSelected, (LPARAM)&LvItem );
-						sprintf_s( Temp, strlen( Temp ) + 1, Text );// processId
+						sprintf_s( Temp, sizeof( Temp ), Text );// processId
 						//		DPrint("message : %s", Temp);
 
 						int isValid = -1;
@@ -1338,7 +1353,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ){
 			{
 				LvItem.iItem=i;
 				LvItem.iSubItem=0;
-				sprintf_s( Temp, strlen( Temp ) + 1, "%d", ptr->first);
+				sprintf_s( Temp, sizeof( Temp ), "%d", ptr->first);
 				LvItem.pszText = Temp;
 				SendMessage( app->hwndListProcess, LVM_INSERTITEM, 0, (LPARAM)&LvItem ); 
 
@@ -1496,7 +1511,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ){
 					LvItem.iItem = nSelected;
 
 					SendMessage( app->hwndListProcess, LVM_GETITEMTEXT, nSelected, (LPARAM)&LvItem );
-					sprintf_s( Temp, strlen( Temp ) + 1, Text );// processId
+					sprintf_s( Temp, sizeof( Temp ), Text );// processId
 					//						DPrint("message : %s", Temp);
 
 					int isValid = -1;
@@ -1513,9 +1528,9 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ){
 
 				}
 				break;
-			case IDC_BUTTON_STOPALL:// oday
+			case IDC_BUTTON_STOPALL:// processid
 				{
-					app->objInject.remoteInjectDll( 3840 );
+					app->objInject.remoteInjectDll( 5728 );
 				}
 				break;
 			}
@@ -1552,7 +1567,7 @@ LRESULT CALLBACK WndProcRegistry( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 			if( 0 != app->nSoftwareID )
 			{
 				char szMsg[256];
-				sprintf_s( szMsg, strlen( szMsg ), "%d", app->nSoftwareID );
+				sprintf_s( szMsg, sizeof( szMsg ), "%d", app->nSoftwareID );
 				SetWindowText( GetDlgItem( hWnd, IDC_EDIT_SOFTID ), szMsg );
 			}
 

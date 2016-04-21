@@ -40,7 +40,11 @@ public:
 	CDati nxDati;
 	HANDLE hMappingFile;
 	infoPlayer info;
+	bool m_bLogin;
+	bool m_bInitAddrOk;
 	static unsigned int _stdcall updateInfo( LPVOID lParam );
+//	static unsigned int _stdcall initAddrData( LPVOID lParam );
+//	void initData(void);
 
 public:
 	bool nxSendMessage( int wParam, int lParam );
