@@ -1,0 +1,86 @@
+
+					char szDst[5];
+					char szScr[9];
+					strcpy_s( szScr, sizeof(szScr), "12345678" );
+
+
+					//1
+					strcpy_s( szDst, sizeof( szDst ), szScr );
+
+					result: "12345"
+					"\0" in szDst[5]. position 6th
+
+					==> crash
+
+					//2
+					strcpy_s( szDst, sizeof( szScr ), szScr );
+					==> is ok. szDst = 12345678
+					"\0" in szDst[8](in memmory). position 9th
+
+
+
+					//3
+					strcpy_s( szDst, 4, szScr );
+
+					result: crash
+					==> crash
+
+
+					//4
+					strcpy_s( szDst, 10 , szScr );
+
+					result: crash
+
+					==> is ok
+					"\0" in szDst[8](in memmory). position 9th
+
+
+					char szDst2[9];
+					char szScr2[5];
+					strcpy_s( szScr2, sizeof(szScr2), "1234" );
+
+
+					//5
+					strcpy_s( szDst2, sizeof( szDst2 ), szScr2 );
+
+					result: "1234"
+					"\0" in szDst[4] (in memmory). position 5th
+
+					
+					==> result: "1234"
+					"\0" in szDst[4] (in memmory). position 5th
+
+
+
+					//6
+					strcpy_s( szDst2, sizeof( szScr2 ), szScr2 );
+
+					result: "1234"
+					"\0" in szDst[4]. position 5th
+
+					==> result: "1234"
+					"\0" in szDst[4]. position 5th
+
+
+					//7
+					strcpy_s( szDst2, 4, szScr2 );
+
+					result: crash
+					==> crash
+
+
+					//8
+					strcpy_s( szDst2, 10 , szScr2 );
+
+					result: 1234
+					"\0" in szDst[4]. position 5th
+
+					==> result: "1234"
+					"\0" in szDst[4]. position 5th
+
+
+					Summary: 
+					strcpy_s( szDst, len , szScr );
+
+					if len < sizeof(szScr) then is Crash
+					else is no broblem
