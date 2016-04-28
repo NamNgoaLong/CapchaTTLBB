@@ -1,0 +1,181 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_MAIN DIALOGEX 300, 50, 446, 256
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Auto Capcha TTLBB"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Registry",IDC_BUTTON_REGISTRY,17,65,60,26
+    PUSHBUTTON      "Start",IDC_BUTTON_START,17,193,52,17
+    PUSHBUTTON      "Stop",IDC_BUTTON_STOP,84,193,50,17
+    PUSHBUTTON      "Stop All",IDC_BUTTON_STOPALL,150,193,51,17
+    LTEXT           "UserName:",IDC_STATIC_USER,25,15,43,13
+    LTEXT           "PassWord:",IDC_STATIC,25,38,48,12
+    EDITTEXT        IDC_EDIT_USERNAME,83,15,97,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PASSWORD,82,36,98,14,ES_AUTOHSCROLL
+    PUSHBUTTON      ">>",IDC_BUTTON_RECORD,202,78,14,20
+    CONTROL         "Auto Start",IDC_CHECK_AUTOSTART,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,62,49,10
+    CONTROL         "Check Result Again",IDC_CHECK_CHECKAGAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,89,82,77,10
+    CONTROL         "Save Password",IDC_CHECK_SAVEPASS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,147,62,65,10
+    LISTBOX         IDC_LIST_RECORD,249,34,162,164,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Record History Anser:",IDC_STATIC_RECORD,247,15,72,8
+    PUSHBUTTON      "Delete",IDC_BUTTON_RECORD_DEL,263,210,59,17
+    PUSHBUTTON      "Delecte All",IDC_BUTTON_RECORD_DELALL,338,210,60,16
+    CONTROL         "",IDC_LIST_Process,"SysListView32",LVS_REPORT | LVS_AUTOARRANGE | WS_TABSTOP,14,110,189,70
+    PUSHBUTTON      "Times Your Account",IDC_BUTTON_TIEMSACCOUNT,28,223,72,19
+    PUSHBUTTON      "Top Up Account",IDC_BUTTON_TOPUPACC,113,224,73,17
+END
+
+IDD_DIALOG_REGISTRY DIALOGEX 0, 0, 222, 234
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Register NxDati"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "OK",IDC_BUTTON_REGISTRY_OK,38,192,62,17
+    PUSHBUTTON      "Cancel",IDC_BUTTON_REGISTRY_CANCEL,121,192,65,17
+    LTEXT           "* UserName:",IDC_STATIC,21,44,42,8
+    LTEXT           "* PassWord:",IDC_STATIC,21,73,42,8
+    EDITTEXT        IDC_EDIT_USERNAME,71,41,106,14,ES_AUTOHSCROLL
+    LTEXT           "SoftwareID:",IDC_STATIC,21,17,40,8
+    EDITTEXT        IDC_EDIT_SOFTID,71,15,54,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PASSWORD,71,70,106,14,ES_AUTOHSCROLL
+    LTEXT           "* Email:",IDC_STATIC,21,98,26,8
+    EDITTEXT        IDC_EDIT_EMAIL,71,95,126,14,ES_AUTOHSCROLL
+    LTEXT           "* NumQQ:",IDC_STATIC,21,121,34,8
+    EDITTEXT        IDC_EDIT_NUMQQ,71,119,56,14,ES_AUTOHSCROLL
+    LTEXT           "* NickName:",IDC_STATIC,21,146,40,8
+    EDITTEXT        IDC_EDIT_NICKNAME,71,143,106,14,ES_AUTOHSCROLL
+    LTEXT           "* Phone:",IDC_STATIC,21,164,30,8
+    EDITTEXT        IDC_EDIT_PHONE,71,163,105,14,ES_AUTOHSCROLL
+END
+
+IDD_DIALOG_DISPLAYBMP DIALOGEX 0, 0, 171, 215
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Check Result Again"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Anser Capcha:",IDC_STATIC,35,62,102,110
+    CONTROL         "",IDC_RADIO_ANSER1,"Button",BS_AUTORADIOBUTTON,48,82,80,10
+    CONTROL         "",IDC_RADIO_ANSER2,"Button",BS_AUTORADIOBUTTON,48,105,80,10
+    CONTROL         "",IDC_RADIO_ANSER3,"Button",BS_AUTORADIOBUTTON,48,129,80,10
+    CONTROL         "",IDC_RADIO_ANSER4,"Button",BS_AUTORADIOBUTTON,48,151,80,10
+    PUSHBUTTON      "OK",IDC_BUTTON_DISPLAY_OK,32,181,50,17
+    PUSHBUTTON      "Cancel",IDC_BUTTON_DISPAY_CANCEL,92,180,50,18
+    CONTROL         "",IDC_STATIC_BITMAP,"Static",SS_BITMAP | SS_CENTERIMAGE,31,22,109,25
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 439
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 249
+    END
+
+    IDD_DIALOG_REGISTRY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 215
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 224
+    END
+
+    IDD_DIALOG_DISPLAYBMP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 164
+        VERTGUIDE, 128
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 208
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
